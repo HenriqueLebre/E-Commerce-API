@@ -1,6 +1,10 @@
 import sqlite3
+from sqlalchemy.ext.declarative import declarative_base
 
 try:
+
+    Base = declarative_base()
+
     conn = sqlite3.connect('database.db')
     cursor = conn.cursor()
     cursor.execute("SELECT sqlite_version()")
