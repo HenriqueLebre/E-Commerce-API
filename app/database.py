@@ -1,21 +1,20 @@
-import sqlite3
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker, declarative_base
 
-try:
+SQLALCHEMY_DATABASE_URL = "sqlite:///./ecommerce.db"
 
-    Base = declarative_base()
+engine = create_engine(
+    SQLALCHEMY_DATABASE_URL,
+    connect_args={"check_same_thread": False}
+)
 
-    conn = sqlite3.connect('database.db')
-    cursor = conn.cursor()
-    cursor.execute("SELECT sqlite_version()")
-    version = cursor.fetchone()
-    print(f"SQLite version: {version[0]}")
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-except sqlite3.Error as e:
+Base = declarative_base()
 
-    print(f"Error occurred: {e}")
-
-finally:
-    if conn:
-        conn.close()
-        print("Database connection closed.")
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
