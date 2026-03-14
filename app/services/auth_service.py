@@ -11,27 +11,28 @@ def hash_password(password: str) -> str:
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
 
-def create_user(db: Session, dados: UserCreate) -> User:
-    existing = db.query(User).filter(
-        User.email == dados.email
-    ).first()
-    if existing:
-        raise ValueError("Email já cadastrado")
+def create_user(db: Session, data: UserCreate) -> User:
+    # Validação de email duplicado
+    if db.query(User).filter(User.email == data.email).first():
+        raise ValueError("Email already exists")
 
-    hashed_password = hash_password(dados.password)
+    # Validação de número duplicado
+    if db.query(User).filter(User.number == data.number).first():
+        raise ValueError("Number already exists")
 
-    novo = User(
-        name = dados.name,
-        email=dados.email,
-        hashed_password=hashed_password,
-        number=dados.number,
+    # Criar usuário com senha hasheada via passlib (não bcrypt direto)
+    new_user = User(
+        name=data.name,
+        email=data.email,
+        hashed_password=hash_password(data.password),  # ← usa a função que já existe
+        number=data.number,
         active=True
     )
-    db.add(novo)
-    db.commit()
-    db.refresh(novo)
 
-    return novo
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+    return new_user
 
 def authenticate_user(db: Session, email: str, password: str) -> User:
     user = db.query(User).filter(User.email == email).first()
@@ -39,4 +40,4 @@ def authenticate_user(db: Session, email: str, password: str) -> User:
         return None
     if not verify_password(password, user.hashed_password):
         return None
-    return user;
+    return user
