@@ -3,7 +3,8 @@ from logging.config import fileConfig
 from app.database import Base
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
-from app.models.user import User  # Importa o modelo para que o Alembic possa detectar as mudanças
+from app.models.user import User  # Importa o modelo para que o Alembic possa detectar as mudanças3
+from app.models.product import Product  # Importa o modelo para que o Alembic possa detectar as mudanças3
 from alembic import context
 
 # this is the Alembic Config object, which provides
