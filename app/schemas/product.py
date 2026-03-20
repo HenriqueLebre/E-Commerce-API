@@ -53,5 +53,12 @@ class ProductResponse(ProductBase):
     dateupdated: Optional[datetime] = None
     datedeactivated: Optional[datetime] = None
 
+class PaginatedProductResponse(BaseModel):
+    items: list[ProductResponse]
+    total: int
+    page: int
+    size: int
+    pages: int
+
     class Config:
         from_attributes = True

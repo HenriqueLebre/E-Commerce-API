@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.core.security import get_current_user
 from app.models.user import User
-from app.schemas.product import ProductCreate, ProductUpdate, ProductResponse
+from app.schemas.product import ProductCreate, ProductUpdate, ProductResponse, PaginatedProductResponse
 from app.services.product_service import (
     create_product, get_products, get_product_by_id, update_product, delete_product
 )
@@ -21,9 +21,19 @@ def create(data: ProductCreate, db: Session = Depends(get_db), current_user: Use
         raise HTTPException(status_code=403, detail="Admin access required")
     return create_product(db, data)
 
-@router.get("/", response_model=list[ProductResponse])
-def list_all(db: Session = Depends(get_db)):
-    return get_products(db)
+@router.get("/", response_model=PaginatedProductResponse)
+def list_all(
+    search: str = None,
+    category: str = None,
+    min_price: float = None,
+    max_price: float = None,
+    page: int = 1,
+    size: int = 20,
+    sort_by: str = "datecreation",
+    order: str = "desc",
+    db: Session = Depends(get_db)
+):
+    return get_products(db, search, category, min_price, max_price, page, size, sort_by, order)
 
 @router.get("/{product_id}", response_model=ProductResponse)
 def get_by_id(product_id: int, db: Session = Depends(get_db)):
