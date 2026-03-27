@@ -6,6 +6,7 @@ from sqlalchemy import pool
 from app.models.user import User  # Importa o modelo para que o Alembic possa detectar as mudanças3
 from app.models.product import Product  # Importa o modelo para que o Alembic possa detectar as mudanças3
 from alembic import context
+from app.models.cart import Cart, CartItem
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
