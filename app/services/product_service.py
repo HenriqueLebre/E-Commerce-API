@@ -3,8 +3,8 @@ from unicodedata import category
 
 from sqlalchemy.orm import Session
 from datetime import datetime
-from app.models.product import Product
-from app.schemas.product import ProductCreate, ProductUpdate
+from app.models.product_models import Product
+from app.schemas.product_schema import ProductCreate, ProductUpdate
 
 def create_product(db: Session, product: ProductCreate) -> Product:
     new_product = Product(

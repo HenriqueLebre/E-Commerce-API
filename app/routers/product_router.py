@@ -4,8 +4,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.core.security import get_current_user
-from app.models.user import User
-from app.schemas.product import ProductCreate, ProductUpdate, ProductResponse, PaginatedProductResponse
+from app.models.user_models import User
+from app.schemas.product_schema import ProductCreate, ProductUpdate, ProductResponse, PaginatedProductResponse
 from app.services.product_service import (
     create_product, get_products, get_product_by_id, update_product, delete_product
 )

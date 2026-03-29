@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
-from app.models.cart import Cart, CartItem
-from app.models.product import Product
-from app.schemas.cart import CartItemCreate, CartItemUpdate
+from app.models.cart_models import Cart, CartItem
+from app.models.product_models import Product
+from app.schemas.cart_schema import CartItemCreate, CartItemUpdate
 
 def get_or_create_cart(db: Session, user_id: int) -> Cart:
     cart = db.query(Cart).filter(Cart.user_id == user_id).first()
