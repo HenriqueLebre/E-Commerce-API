@@ -19,3 +19,7 @@ class OrderResponse(BaseModel):
 
     class Config:
         from_attributes = True
+        
+class CheckoutResponse(BaseModel):
+    order: OrderResponse
+    payment_url: str

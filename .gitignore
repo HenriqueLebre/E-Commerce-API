@@ -84,3 +84,7 @@ Thumbs.db
 *.ini
 *.mako
 *.h
+
+.env
+__pycache__/
+*.db

@@ -4,8 +4,9 @@ from sqlalchemy.orm import Session
 from app.models.cart_models import Cart, CartItem
 from app.models.order_models import Order, OrderItem, OrderStatus
 from app.models.product_models import Product
+from app.services.stripe_service import create_checkout_session
 
-def create_order(db: Session, user_id: int) -> Order:
+def create_order(db: Session, user_id: int) -> dict:
     try:
         # 1. Buscar carrinho
         cart = db.query(Cart).filter(Cart.user_id == user_id).first()
@@ -48,14 +49,23 @@ def create_order(db: Session, user_id: int) -> Order:
         # 5. Limpar carrinho
         db.query(CartItem).filter(CartItem.cart_id == cart.id).delete()
 
-        # 6. Commit — tudo ou nada
         db.commit()
         db.refresh(order)
-        return order
+
+                # Gera link de pagamento
+        payment_url = create_checkout_session(order)
+
+        return {
+                    "order": order,
+                    "payment_url": payment_url
+                }
 
     except Exception:
         db.rollback()
-        raise
+        raise;
+
+
+
 
 def get_orders(db: Session, user_id: int) -> list[Order]:
     return db.query(Order).filter(Order.user_id == user_id).all()

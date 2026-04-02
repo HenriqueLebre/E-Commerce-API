@@ -7,13 +7,14 @@ from app.core.security import get_current_user
 from app.models.user_models import User
 from app.schemas.order_schema import OrderResponse
 from app.services.order_service import create_order, get_orders, get_order_by_id
+from app.schemas.order_schema import OrderResponse, CheckoutResponse
 
 router = APIRouter(
     prefix="/orders",
     tags=["Orders"]
 )
 
-@router.post("/checkout", response_model=OrderResponse)
+@router.post("/checkout", response_model=CheckoutResponse)
 def checkout(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     try:
         return create_order(db, current_user.id)
