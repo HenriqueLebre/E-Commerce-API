@@ -5,6 +5,8 @@ from app.routers import product_router
 from app.routers import cart_router
 from app.routers import order_router
 from app.routers import webhook_router
+from app.routers import user_router
+
 
 
 app = FastAPI()
@@ -14,6 +16,7 @@ app.include_router(product_router.router)
 app.include_router(cart_router.router)
 app.include_router(order_router.router)
 app.include_router(webhook_router.router)
+app.include_router(user_router.router)
 
 @app.get("/health")
 def health():
