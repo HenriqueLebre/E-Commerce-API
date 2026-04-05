@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.core.security import get_current_admin
@@ -8,31 +8,21 @@ from app.services.product_service import (
     create_product, get_products, get_product_by_id, update_product, delete_product
 )
 
-router = APIRouter(
-    prefix="/products",
-    tags=["Products"]
-)
+router = APIRouter(prefix="/products", tags=["Products"])
 
 @router.get("/", response_model=PaginatedProductResponse)
 def list_all(
-    search: str = None,
-    category: str = None,
-    min_price: float = None,
-    max_price: float = None,
-    page: int = 1,
-    size: int = 20,
-    sort_by: str = "datecreation",
-    order: str = "desc",
+    search: str = None, category: str = None,
+    min_price: float = None, max_price: float = None,
+    page: int = 1, size: int = 20,
+    sort_by: str = "datecreation", order: str = "desc",
     db: Session = Depends(get_db)
 ):
     return get_products(db, search, category, min_price, max_price, page, size, sort_by, order)
 
 @router.get("/{product_id}", response_model=ProductResponse)
 def get_by_id(product_id: int, db: Session = Depends(get_db)):
-    try:
-        return get_product_by_id(db, product_id)
-    except ValueError as err:
-        raise HTTPException(status_code=404, detail=str(err))
+    return get_product_by_id(db, product_id)
 
 @router.post("/", response_model=ProductResponse)
 def create(data: ProductCreate, db: Session = Depends(get_db), admin: User = Depends(get_current_admin)):
@@ -40,15 +30,9 @@ def create(data: ProductCreate, db: Session = Depends(get_db), admin: User = Dep
 
 @router.put("/{product_id}", response_model=ProductResponse)
 def update(product_id: int, data: ProductUpdate, db: Session = Depends(get_db), admin: User = Depends(get_current_admin)):
-    try:
-        return update_product(db, product_id, data)
-    except ValueError as err:
-        raise HTTPException(status_code=404, detail=str(err))
+    return update_product(db, product_id, data)
 
 @router.delete("/{product_id}")
 def delete(product_id: int, db: Session = Depends(get_db), admin: User = Depends(get_current_admin)):
-    try:
-        delete_product(db, product_id)
-        return {"detail": "Product deactivated successfully"}
-    except ValueError as err:
-        raise HTTPException(status_code=404, detail=str(err))
+    delete_product(db, product_id)
+    return {"detail": "Product deactivated successfully"}
