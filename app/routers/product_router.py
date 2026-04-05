@@ -1,9 +1,7 @@
-# app/routers/product_router.py
-
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.database import get_db
-from app.core.security import get_current_user
+from app.core.security import get_current_admin
 from app.models.user_models import User
 from app.schemas.product_schema import ProductCreate, ProductUpdate, ProductResponse, PaginatedProductResponse
 from app.services.product_service import (
@@ -14,12 +12,6 @@ router = APIRouter(
     prefix="/products",
     tags=["Products"]
 )
-
-@router.post("/", response_model=ProductResponse)
-def create(data: ProductCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    if not current_user.isadmin:
-        raise HTTPException(status_code=403, detail="Admin access required")
-    return create_product(db, data)
 
 @router.get("/", response_model=PaginatedProductResponse)
 def list_all(
@@ -42,19 +34,19 @@ def get_by_id(product_id: int, db: Session = Depends(get_db)):
     except ValueError as err:
         raise HTTPException(status_code=404, detail=str(err))
 
+@router.post("/", response_model=ProductResponse)
+def create(data: ProductCreate, db: Session = Depends(get_db), admin: User = Depends(get_current_admin)):
+    return create_product(db, data)
+
 @router.put("/{product_id}", response_model=ProductResponse)
-def update(product_id: int, data: ProductUpdate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    if not current_user.isadmin:
-        raise HTTPException(status_code=403, detail="Admin access required")
+def update(product_id: int, data: ProductUpdate, db: Session = Depends(get_db), admin: User = Depends(get_current_admin)):
     try:
         return update_product(db, product_id, data)
     except ValueError as err:
         raise HTTPException(status_code=404, detail=str(err))
 
 @router.delete("/{product_id}")
-def delete(product_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    if not current_user.isadmin:
-        raise HTTPException(status_code=403, detail="Admin access required")
+def delete(product_id: int, db: Session = Depends(get_db), admin: User = Depends(get_current_admin)):
     try:
         delete_product(db, product_id)
         return {"detail": "Product deactivated successfully"}

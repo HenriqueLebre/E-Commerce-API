@@ -1,13 +1,11 @@
-# app/routers/order_router.py
-
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.database import get_db
-from app.core.security import get_current_user
+from app.core.security import get_current_user, get_current_admin
 from app.models.user_models import User
-from app.schemas.order_schema import OrderResponse
-from app.services.order_service import create_order, get_orders, get_order_by_id
+from app.models.order_models import Order
 from app.schemas.order_schema import OrderResponse, CheckoutResponse
+from app.services.order_service import create_order, get_orders, get_order_by_id
 
 router = APIRouter(
     prefix="/orders",
@@ -31,3 +29,7 @@ def get_order(order_id: int, db: Session = Depends(get_db), current_user: User =
         return get_order_by_id(db, current_user.id, order_id)
     except ValueError as err:
         raise HTTPException(status_code=404, detail=str(err))
+
+@router.get("/admin/all", response_model=list[OrderResponse])
+def list_all_orders(db: Session = Depends(get_db), admin: User = Depends(get_current_admin)):
+    return db.query(Order).all()
